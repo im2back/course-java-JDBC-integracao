@@ -10,10 +10,12 @@ import java.util.Scanner;
 public class BytebankApplication {
 
     private static ContaService service = new ContaService();
-    private static Scanner teclado = new Scanner(System.in).useDelimiter("\n");
+    private static Scanner teclado = new Scanner(System.in);
+
 
     public static void main(String[] args) {
-        var opcao = exibirMenu();
+        
+    	var opcao = exibirMenu();
         while (opcao != 7) {
             try {
                 switch (opcao) {
@@ -41,6 +43,7 @@ public class BytebankApplication {
                 System.out.println("Pressione qualquer tecla e de ENTER para voltar ao menu");
                 teclado.next();
             }
+            
             opcao = exibirMenu();
         }
 
@@ -58,7 +61,9 @@ public class BytebankApplication {
                 6 - Realizar depósito em uma conta
                 7 - Sair
                 """);
-        return teclado.nextInt();
+        var numero = teclado.nextInt();
+       
+        return numero;
     }
 
     private static void listarContas() {
