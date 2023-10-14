@@ -78,7 +78,7 @@ public class BytebankApplication {
     private static void abrirConta() {
         System.out.println("Digite o número da conta:");
         var numeroDaConta = teclado.nextInt();
-
+        
         System.out.println("Digite o nome do cliente:");
         var nome = teclado.next();
 
