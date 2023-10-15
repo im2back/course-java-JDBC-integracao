@@ -9,7 +9,7 @@ import com.zaxxer.hikari.HikariDataSource;
 public class ConnectionFactory {
 
 	public Connection recuperarConexao() {
-		// Usando o m[etodo drivermanager e Abrindo a conexao no banco de dados
+		// Usando o metodo drivermanager e Abrindo a conexao no banco de dados
 		try {
 			return createDataSource().getConnection();
 

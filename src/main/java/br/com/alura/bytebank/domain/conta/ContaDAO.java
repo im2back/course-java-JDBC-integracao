@@ -14,10 +14,11 @@ import br.com.alura.bytebank.domain.cliente.DadosCadastroCliente;
 public class ContaDAO {
 	
 	private Connection conn;
-	
+
 	ContaDAO(Connection connection){
 		this.conn = connection;
 	}
+	
 	
 	public void salvar(DadosAberturaConta dadosDaConta) {
 		var cliente = new Cliente(dadosDaConta.dadosCliente());
@@ -45,15 +46,16 @@ public class ContaDAO {
 
 	@SuppressWarnings("unused")
 	public Set<Conta> listar() {
+		
 		PreparedStatement ps;
 		ResultSet resultSet;
-		
 		Set<Conta> contas = new HashSet<>();
-		String sql ="SELECT * FROM conta";
+		
+		String sql = "SELECT * FROM conta";
 		
 		try {
 			
-			ps = conn.prepareStatement(sql);
+			 ps = conn.prepareStatement(sql);
 			 resultSet = ps.executeQuery();
 			
 			while(resultSet.next()) {
@@ -77,4 +79,79 @@ public class ContaDAO {
 		
 		return contas;
 	}
+
+	public void alterar(Integer numeroDaConta,BigDecimal amount) {
+		
+		PreparedStatement ps;	
+		String sql = "UPDATE conta SET saldo = ? WHERE numero = ?";
+		
+		try {
+			ps= conn.prepareStatement(sql);	
+			
+			ps.setBigDecimal(1, amount);
+			ps.setInt(2, numeroDaConta);	
+			
+			ps.execute();
+			ps.close();
+			
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}	
+	}
+	
+	public Conta listarPorNumero(Integer numero) {
+		 PreparedStatement ps;
+		 ResultSet resultSet;
+		 Conta conta = null;
+		 
+		String sql = "SELECT * FROM conta WHERE numero = ?";
+		
+		try {
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, numero);
+			resultSet = ps.executeQuery();
+			
+			while (resultSet.next()) {
+                Integer numeroRecuperado = resultSet.getInt(1);
+                BigDecimal saldo = resultSet.getBigDecimal(2);
+                String nome = resultSet.getString(3);
+                String cpf = resultSet.getString(4);
+                String email = resultSet.getString(5);
+
+                DadosCadastroCliente dadosCadastroCliente =
+                        new DadosCadastroCliente(nome, cpf, email);
+                Cliente cliente = new Cliente(dadosCadastroCliente);
+
+                conta = new Conta(numeroRecuperado, saldo, cliente);
+            }
+            resultSet.close();
+            ps.close();
+            conn.close();
+			
+			
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		 return conta;
+	}
+
+	public void sacar(Integer numeroDaConta,BigDecimal amount) {
+		PreparedStatement ps;
+		
+		String sql = "UPDATE conta SET saldo = ? WHERE numero = ? ";
+		try {
+			ps = conn.prepareStatement(sql);
+			ps.setBigDecimal(1, amount);
+			ps.setInt(2, numeroDaConta);
+			
+			ps.execute();
+			ps.close();
+			
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		
+	}
 }
+
+	
