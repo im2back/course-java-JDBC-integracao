@@ -2,7 +2,6 @@ package br.com.alura.bytebank.domain.conta;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.util.HashSet;
 import java.util.Set;
 
 import br.com.alura.bytebank.ConnectionFactory;
@@ -13,9 +12,7 @@ public class ContaService {
 
 	public ContaService() {
 		this.connection = new ConnectionFactory();
-	}
-
-	private Set<Conta> contas = new HashSet<>();
+	}	
 
 	public Set<Conta> listarContasAbertas() {
 		Connection conn = connection.recuperarConexao();
@@ -59,24 +56,31 @@ public class ContaService {
 		if (valor.compareTo(BigDecimal.ZERO) <= 0) {
 			throw new RegraDeNegocioException("Valor do deposito deve ser superior a zero!");
 		}
-					// Abrindo conexão com a database
-					Connection conn = connection.recuperarConexao();
-					System.out.println(conta.getNumero());
+			// Abrindo conexão com a database
+			Connection conn = connection.recuperarConexao();		
 					
-					new ContaDAO(conn).alterar(conta.getNumero(), valor.add(conta.getSaldo()));
-		
+			new ContaDAO(conn).alterar(conta.getNumero(), valor.add(conta.getSaldo()));
 	}
 
+	public void realizarTransferencia(Integer contaRaiz, Integer contaDestino, BigDecimal valor) {
+		Conta contaR = buscarContaPorNumero(contaRaiz);
+		Conta contaD = buscarContaPorNumero(contaDestino);
+		
+		this.realizarSaque(contaR.getNumero(), valor);
+		this.realizarDeposito(contaD.getNumero(), valor);
+		
+	}
+	
 	public void encerrar(Integer numeroDaConta) {
 		var conta = buscarContaPorNumero(numeroDaConta);
 		if (conta.possuiSaldo()) {
 			throw new RegraDeNegocioException("Conta não pode ser encerrada pois ainda possui saldo!");
 		}
-
-		contas.remove(conta);
+		Connection conn = connection.recuperarConexao();
+		new ContaDAO(conn).encerrarConta(numeroDaConta);
 	}
 
-	   private Conta buscarContaPorNumero(Integer numero) {
+	private Conta buscarContaPorNumero(Integer numero) {
 	        Connection conn = connection.recuperarConexao();
 	        Conta conta = new ContaDAO(conn).listarPorNumero(numero);
 	        if(conta != null) {
@@ -85,4 +89,13 @@ public class ContaService {
 	            throw new RegraDeNegocioException("Não existe conta cadastrada com esse número!");
 	        }
 	    }
+
+	public void desativarConta(Integer numeroDaConta) {
+		var conta = buscarContaPorNumero(numeroDaConta);
+		
+		Connection conn = connection.recuperarConexao();
+		new ContaDAO(conn).desativarConta(conta.getNumero());
+		
+		
+	}
 }

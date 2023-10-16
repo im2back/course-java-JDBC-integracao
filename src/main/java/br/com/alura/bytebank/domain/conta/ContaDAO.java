@@ -51,7 +51,7 @@ public class ContaDAO {
 		ResultSet resultSet;
 		Set<Conta> contas = new HashSet<>();
 		
-		String sql = "SELECT * FROM conta";
+		String sql = "SELECT * FROM conta WHERE ativo = true";
 		
 		try {
 			
@@ -150,6 +150,40 @@ public class ContaDAO {
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
+		
+	}
+
+	public void encerrarConta(Integer numeroDaConta) {
+		PreparedStatement ps;
+		String sql = "DELETE FROM conta WHERE numero = ?";
+				
+				try {
+					ps = conn.prepareStatement(sql);
+					ps.setInt(1, numeroDaConta);
+					
+					ps.execute();
+					ps.close();
+					
+				} catch (SQLException e) {
+					throw new RuntimeException(e);
+				}
+	}
+
+
+	public void desativarConta(Integer numeroDaConta) {
+		PreparedStatement ps;
+		String sql = "UPDATE conta SET ativo = false WHERE numero = ?";
+				
+				try {
+					ps = conn.prepareStatement(sql);
+					ps.setInt(1, numeroDaConta);
+					
+					ps.execute();
+					ps.close();
+					
+				} catch (SQLException e) {
+					throw new RuntimeException(e);
+				}
 		
 	}
 }
